@@ -1,0 +1,46 @@
+
+apply plugin: 'java'
+apply plugin: 'org.javalite.activejdbc'
+
+group 'com.norcomet.portfoliotracker'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'mysql:mysql-connector-java:8.0.15'
+    compile 'org.javalite:activejdbc:2.2'
+    compile 'org.javalite:activeweb:2.2'
+    compile 'com.amazonaws:aws-lambda-java-core:1.1.0'
+    compile 'com.amazonaws:aws-lambda-java-events:1.1.0'
+    testCompile  'junit:junit:4.12'
+    testCompile  'org.mockito:mockito-core:2.27.0'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'org.javalite', name: 'activejdbc-gradle-plugin', version: '2.2'
+    }
+}
+
+task buildZip(type: Zip) {
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.compileClasspath
+    }
+}
+build.dependsOn buildZip
+
+task copyClasses(type: Copy) {
+    from "${buildDir}/classes/java/main"
+    into "out/production/classes"
+}
+copyClasses.dependsOn(compileJava)
